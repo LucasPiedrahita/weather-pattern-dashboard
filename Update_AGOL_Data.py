@@ -1,8 +1,10 @@
+
+
 # To run this script, enter the following command in the command line:
-# C:\"Program Files"\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe L:\Projects\RainfallDashboard\Update_AGOL_Data.py
-#
-# This script updates the Wake_Monthly_Weather item in ArcGIS Online to include the most recent data available from
-# ncdc.noaa.gov.
+# C:\"Program Files"\ArcGIS\Pro\bin\Python\envs\arcgispro-py3\python.exe L:\Projects\WeatherDashboard\Update_AGOL_Data.py
+# This script updates the Wake_Monthly_Weather item in ArcGIS Online to
+# include the most recent data available from ncdc.noaa.gov.
+
 
 import datetime
 import os
@@ -15,6 +17,7 @@ from arcgis.gis import GIS
 climate_variables = ['pcp', 'tmax', 'tmin', 'tavg']
 column_names = ['Precip_Inches', 'TempMax_DegF', 'TempMin_DegF', 'TempAvg_DegF']
 today = datetime.datetime.now()
+url_start = 'https://www.ncdc.noaa.gov/cag/county/time-series/NC-183-'
 url_end = '-all-{0}-{1}-{2}.csv'.format(str(today.month - 1), str(today.year - 50), str(today.year))
 relative_path = sys.path[0]
 
@@ -22,7 +25,7 @@ try:
     # Loop through each variable and get the data from ncdc.noaa.gov
     for i in range(len(climate_variables)):
         print('Getting {0} data from ncdc.noaa.gov...'.format(climate_variables[i]))
-        url = 'https://www.ncdc.noaa.gov/cag/county/time-series/NC-183-{0}{1}'.format(climate_variables[i], url_end)
+        url = '{0}{1}{2}'.format(url_start, climate_variables[i], url_end)
         response = requests.get(url)
         text = response.text.splitlines()
         lst = []
@@ -47,6 +50,7 @@ except Exception as e:
 if len(df) > 600:
     csv_name = 'Wake_Monthly_Weather.csv'
     csv_path = os.path.join(relative_path, csv_name)
+    print('csv_path: {0}'.format(csv_path))
     try:
         # Write the df to csv
         print('Exporting DataFrame to CSV, {0}.'.format(csv_name))
@@ -119,8 +123,8 @@ if len(df) > 600:
                       'in this dashboard are part of the US Climate Divisional Dataset and were sourced ' \
                       'from <a href="https://www.ncdc.noaa.gov/cag/county/time-series" target="_blank"' \
                       '>https://www.ncdc.noaa.gov/cag/county/time-series</a>. </div><div><br /></div>' \
-                      '<div>Includes data from January, 1999 to {0}. See the <a href="https://wake.' \
-                      'maps.arcgis.com/home/item.html?id=a2547341df7e4af393bcbe050c646232" target="_' \
+                      '<div>Includes data from January, 1999 to {0}. See the <a href="http://wake.maps.arcgis.' \
+                      'com/home/item.html?id=c0d8a9375cfd47708b598c5441ab9e86" target="_' \
                       'blank">Wake_Monthly_Weather</a> data details for more information on source data.' \
                       '</div>'.replace(u'\xa0', u' ').format(datetime.date(today.year, today.month - 1,
                                                                            1).strftime('%B, %Y'))
